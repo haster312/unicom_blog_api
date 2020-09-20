@@ -36,23 +36,30 @@ if (!function_exists('get_data')) {
     }
 }
 
-if (!function_exists('pagination')) {
+if (!function_exists('paging')) {
     /**
-     * @param $response
+     * @param $data
      * @param null $message
-     * @throws JsonResponse
      * response {data, current, total}
      */
-    function pagination($response, $message = null)
+    function paging($data, $message = null)
     {
         if (!$message) {
             $message = config('API.message.Success');
         }
 
+        $response = [
+            'success' => true,
+            'data' => $data['data'],
+            'current' => $data['current_page'],
+            'total' => $data['total'],
+            'message' => $message
+        ];
+
         $response['success'] = true;
         $response['message'] = $message;
 
-        throw new JsonResponse($response, 200);
+        response()->json($response)->send();exit;
     }
 }
 

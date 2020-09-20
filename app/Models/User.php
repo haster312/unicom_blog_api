@@ -20,8 +20,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'password', 'social', 'social_token', 'social_id',
-        'university_id', 'course_id', 'avatar_id'
+        'first_name', 'last_name', 'username', 'email', 'password', 'social', 'social_token', 'social_id',
+        'university_id', 'course_id', 'avatar_id', 'bio'
     ];
 
     /**
@@ -51,5 +51,10 @@ class User extends Authenticatable
     public function Course()
     {
         return $this->belongsTo(Course::class, 'course_id', 'id');
+    }
+
+    public function Article()
+    {
+        return $this->hasMany(Article::class, 'author_id', 'id');
     }
 }

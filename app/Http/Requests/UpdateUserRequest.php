@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Route;
 
 
-class RegisterRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     protected $type;
 
@@ -36,10 +36,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             'first_name' => 'required|max:50',
-            'last_name' => 'required|max:50',
-            'email' => 'required|email|unique:users',
-            'username' => 'required|unique:users',
-            'password' => 'required|min:8'
+            'last_name' => 'required|max:50'
         ];
     }
 }

@@ -55,4 +55,14 @@ class AuthController extends Controller
 
         success($user);
     }
+
+    public function logout()
+    {
+        if (auth()->check()) {
+            auth()->user()->AuthAcessToken()->delete();
+            success(true);
+        }
+
+        error(false);
+    }
 }

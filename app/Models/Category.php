@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
+use App\Models\Base;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    use BaseModel;
+    use Base;
     protected $table = 'category';
+    protected $fillable = ['name', 'slug', 'order'];
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSubCategoryTable extends Migration
+class CreateArticleTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,22 @@ class CreateSubCategoryTable extends Migration
      */
     public function up()
     {
-        Schema::create('sub_category', function (Blueprint $table) {
+        Schema::create('article', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('slug');
-            $table->tinyInteger('order')->default(0);
+            $table->string('title', 100);
+            $table->string('slug', 100);
+            $table->text('content');
+            $table->integer('author_id');
             $table->integer('category_id');
+            $table->integer('subcategory_id')->nullable();
+            $table->integer('view_count')->default(0);
+            $table->tinyInteger('status')->default(1);
             $table->integer('created_at');
             $table->integer('updated_at');
         });
-        Schema::table('sub_category', function (Blueprint $table) {
+
+        Schema::table('article', function (Blueprint $table) {
+            $table->foreign('author_id')->references('id')->on('users');
             $table->foreign('category_id')->references('id')->on('category');
         });
     }
@@ -34,6 +40,6 @@ class CreateSubCategoryTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sub_category');
+        Schema::dropIfExists('article');
     }
 }

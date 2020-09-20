@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Route;
 
 
-class RegisterRequest extends FormRequest
+class ArticleRequest extends FormRequest
 {
     protected $type;
 
@@ -35,11 +35,9 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'first_name' => 'required|max:50',
-            'last_name' => 'required|max:50',
-            'email' => 'required|email|unique:users',
-            'username' => 'required|unique:users',
-            'password' => 'required|min:8'
+            'title' => 'required|max:100',
+            'content' => 'required',
+            'category_id' => 'required'
         ];
     }
 }

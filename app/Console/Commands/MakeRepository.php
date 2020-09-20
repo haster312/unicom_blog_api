@@ -52,12 +52,12 @@ class MakeRepository extends GeneratorCommand
 
 $mainSpace
 
-use App\Models\BaseModel;
+use App\Models\Base;
 use Illuminate\Database\Eloquent\Model;
 
 class {$model} extends Model
 {
-    use BaseModel;
+    use Base;
     $tableName
 }
 ";
@@ -101,10 +101,10 @@ class {$model}Repo extends BaseRepo
             File::makeDirectory($folder, $mode = 0777, true, true);
         }
 
-        $written = Storage::disk('app')->put('Repositories/' . $namespace . '/'. $this->argument('name') . 'Repository.php', $content);
+        $written = Storage::disk('app')->put('Repositories/' . $namespace . '/'. $this->argument('name') . 'Repo.php', $content);
 
         if ($written) {
-            $this->info('Created new Repo ' . $this->argument('name') . 'Repository.php in App\Repositories\\' . $namespace);
+            $this->info('Created new Repo ' . $this->argument('name') . 'Repo.php in App\Repositories\\' . $namespace);
         } else {
             $this->info('Something went wrong');
         }
