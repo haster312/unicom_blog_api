@@ -20,7 +20,7 @@ class CreateArticleTable extends Migration
             $table->text('short_content')->nullable();
             $table->text('content');
             $table->unsignedBigInteger('thumbnail_id')->nullable();
-            $table->integer('author_id');
+            $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('subcategory_id')->nullable();
             $table->integer('view_count')->default(0);
