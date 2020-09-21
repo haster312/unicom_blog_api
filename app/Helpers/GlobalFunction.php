@@ -53,6 +53,7 @@ if (!function_exists('paging')) {
             'data' => $data['data'],
             'current' => $data['current_page'],
             'total' => $data['total'],
+            'per_page' => $data['per_page'],
             'message' => $message
         ];
 

@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ArticleRequest;
 use App\Services\ArticleService;
 use Illuminate\Http\Request;
-use mysql_xdevapi\Exception;
 
 class ArticleController extends Controller
 {
@@ -18,9 +17,26 @@ class ArticleController extends Controller
         $this->articleService = $articleService;
     }
 
-    public function getFeatured()
+    public function getSelfArticle()
     {
+        $this->getUser($user);
+        $articles = $this->articleService->getSelfArticle($user->id);
 
+        paging($articles);
+    }
+
+    /**
+     * Get feature article for home page
+     */
+    public function getFeature()
+    {
+        try {
+            $articles = $this->articleService->getFeatureArticle();
+
+            success($articles);
+        } catch (\Exception $exception) {
+            error($exception->getMessage());
+        }
     }
 
     public function getLatest()
@@ -28,6 +44,9 @@ class ArticleController extends Controller
 
     }
 
+    /**
+     * Get most popular for home page
+     */
     public function getMostPopular()
     {
         try {
@@ -39,6 +58,10 @@ class ArticleController extends Controller
         }
     }
 
+    /**
+     * Weekly popular relate to current article's category
+     * @param Request $request
+     */
     public function getWeeklyPopular(Request $request)
     {
         $data = getData($request);
@@ -53,6 +76,10 @@ class ArticleController extends Controller
         }
     }
 
+    /**
+     * monthly popular relate to current article's category
+     * @param Request $request
+     */
     public function getMonthlyPopular(Request $request)
     {
         $data = getData($request);
@@ -73,7 +100,20 @@ class ArticleController extends Controller
         paging($articles);
     }
 
-    public function detail($slug)
+    public function detail($id)
+    {
+        $this->getUser($user);
+        $article = $this->articleService->checkArticle($id, $user->id);
+
+        if (!$article) {
+            error(messages('Forbidden'));
+        }
+
+        $article = $this->articleService->getArticleById($id, $user->id);
+        success($article);
+    }
+
+    public function detailSlug($slug)
     {
         $article = $this->articleService->getArticleBySlug($slug);
         // Return detail
@@ -99,7 +139,7 @@ class ArticleController extends Controller
     {
         $this->getUser($user);
         $data = getData($request);
-        $article = $this->articleService->checkArticle($user->id, $data);
+        $article = $this->articleService->checkArticle($id, $user->id);
 
         if (!$article) {
             error(messages('Forbidden'));

@@ -9,7 +9,8 @@ class Article extends Model
 {
     use Base;
     protected $table = 'article';
-    protected $fillable = ['title', 'slug', 'content', 'author_id', 'category_id', 'subcategory_id', 'status'];
+    protected $fillable = ['title', 'short_content', 'slug', 'content', 'author_id',
+        'category_id', 'subcategory_id', 'status', 'thumbnail_id'];
 
     public function Author()
     {
@@ -19,6 +20,16 @@ class Article extends Model
     public function Category()
     {
         return $this->belongsTo(Category::class ,'category_id', 'id');
+    }
+
+    public function ArticleTag()
+    {
+        return $this->hasMany(ArticleTag::class, 'article_id', 'id');
+    }
+
+    public function Thumbnail()
+    {
+        return $this->belongsTo(Image::class, 'thumbnail_id', 'id');
     }
 
     public function setContentAttribute($value)

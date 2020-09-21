@@ -44,15 +44,21 @@ Route::group(['prefix' => 'category'], function () {
 
 Route::group(['prefix' => 'article'], function () {
     Route::get('/category/{categoryId}', [ArticleController::class, 'getListWithCategory']);
-    Route::get('/{slug}', [ArticleController::class, 'detail']);
+    Route::get('/slug/{slug}', [ArticleController::class, 'detailSlug']);
 
     Route::group(['prefix' => 'popular'], function () {
-        Route::get('/all', [ArticleController::class, 'getMostPopular']);
+        Route::get('/most', [ArticleController::class, 'getMostPopular']);
         Route::get('/week', [ArticleController::class, 'getWeeklyPopular']);
         Route::get('/month', [ArticleController::class, 'getMonthlyPopular']);
+        Route::get('/feature', [ArticleController::class, 'getFeature']);
     });
 
+    /**
+     * Article action requires authentication
+     */
     Route::group(['middleware' => ['auth:api']], function () {
+        Route::get('/self', [ArticleController::class, 'getSelfArticle']);
+        Route::get('/{id}', [ArticleController::class, 'detail'])->where('id', '[0-9]+');;
         Route::post('/', [ArticleController::class, 'new']);
         Route::post('/{id}', [ArticleController::class, 'update']);
         Route::delete('/{id}', [ArticleController::class, 'delete']);

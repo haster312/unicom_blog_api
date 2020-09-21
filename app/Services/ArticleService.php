@@ -5,6 +5,8 @@ namespace App\Services;
 
 
 use App\Repositories\ArticleRepo;
+use App\Repositories\ArticleTagRepo;
+use App\Repositories\TagRepo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -12,22 +14,66 @@ use Illuminate\Support\Str;
 class ArticleService extends BaseService
 {
     public $articleRepo;
+    public $tagRepo;
+    public $articleTagRepo;
+    public $tagIds = [];
+    public $singleRelation = [];
+    public $categoryRelation = [];
 
-    public function __construct(ArticleRepo $articleRepo)
+    public function __construct(
+        ArticleRepo $articleRepo,
+        TagRepo $tagRepo,
+        ArticleTagRepo $articleTagRepo)
     {
         parent::__construct();
         $this->articleRepo = $articleRepo;
+        $this->tagRepo = $tagRepo;
+        $this->articleTagRepo = $articleTagRepo;
+        $this->categoryRelation = [
+            'Category' => function($q) {
+                $q->select('id', 'name');
+            },
+            'Author' => function($q) {
+                $q->select('id', 'first_name', 'last_name');
+            },
+            'Author.Avatar' => function($q) {
+                $q->select('id', 'main', 'thumbnail');
+            },
+            'Thumbnail' => function($q) {
+                $q->select('id', 'main', 'thumbnail');
+            },
+            'ArticleTag' => function($q) {
+                $q->select('id', 'article_id', 'tag_id');
+            },
+            'ArticleTag.Tag' => function($q) {
+                $q->select('id', 'name');
+            }
+        ];
+    }
+
+    public function getSelfArticle($userId)
+    {
+        $articles = $this->articleRepo->model->with([
+                    'Category' => function($q) {
+                        $q->select('id', 'name');
+                    },
+                    'Thumbnail' => function($q) {
+                        $q->select('id', 'main', 'thumbnail');
+                    },
+                    'ArticleTag' => function($q) {
+                        $q->select('id', 'article_id', 'tag_id');
+                    },
+                    'ArticleTag.Tag' => function($q) {
+                        $q->select('id', 'name');
+                    }
+                ])->where('author_id', $userId)->orderBy('created_at', 'DESC')->paginate($this->size);
+
+        return $articles->toArray();
     }
 
     public function getPopularByPeriod($categoryId = null, $type = null)
     {
-        $query = $this->articleRepo->model->with(
-                [
-                    'Author' => function($q) {
-                        $q->select('id', 'first_name', 'last_name');
-                    },
-                    'Category'
-                ]);
+        $query = $this->articleRepo->model->with($this->categoryRelation);
 
         switch ($type) {
             case 'week':
@@ -52,7 +98,8 @@ class ArticleService extends BaseService
             $query->where('category_id', $categoryId);
         }
 
-        return $query->orderBy('view_count', 'DESC')
+        return $query->where('status', 1)
+                ->orderBy('view_count', 'DESC')
                 ->limit($this->size)
                 ->get();
     }
@@ -64,80 +111,169 @@ class ArticleService extends BaseService
      */
     public function getArticlesByCategory($categoryId)
     {
-        $articles = $this->articleRepo->model->with(
-                [
-                    'Author' => function($q) {
-                        $q->select('id', 'first_name', 'last_name');
-                    },
-                    'Category'
-                ])->where('category_id', $categoryId)->paginate($this->size);
+        $articles = $this->articleRepo->model->with($this->categoryRelation)
+            ->where('category_id', $categoryId)
+            ->where('status', 1)
+            ->paginate($this->size);
 
         return $articles->toArray();
+    }
+
+    public function getFeatureArticle()
+    {
+        return $this->articleRepo->model
+            ->with($this->categoryRelation)
+            ->where('status', 1)
+            ->orderBy('view_count', 'DESC')
+            ->limit($this->size)->get();
     }
 
     /**
      * Check if article belong to user
      * @param $userId
-     * @param $id
+     * @param $articleId
      * @return mixed
      */
-    public function checkArticle($userId, $id)
+    public function checkArticle($articleId, $userId)
     {
         return $this->articleRepo->model->select('id')
-                ->where('id', $id)
+                ->where('id', $articleId)
                 ->where('author_id', $userId)
                 ->first();
     }
 
     /**
-     * Get detail by article Id
+     * Get detail by article Id or with userId
      * @param $id
+     * @param $userId
      * @return mixed
      */
-    public function getArticleById($id)
+    public function getArticleById($id, $userId = null)
     {
-        return $this->articleRepo->model->with(
+        $query = $this->articleRepo->model->with(
                 [
+                    'Category' => function($q) {
+                        $q->select('id', 'name');
+                    },
                     'Author' => function($q) {
                         $q->select('id', 'first_name', 'last_name');
                     },
-                    'Category'
-                ])->where('id', $id)->first();
+                    'ArticleTag' => function($q) {
+                        $q->select('id', 'article_id', 'tag_id');
+                    },
+                    'ArticleTag.Tag' => function($q) {
+                        $q->select('id', 'name');
+                    },
+                    'Thumbnail' => function($q) {
+                        $q->select('id', 'main', 'thumbnail');
+                    },
+                ]);
+
+        if ($userId) {
+            $query->where('author_id', $userId);
+        }
+
+        return $query->where('id', $id)->first();
     }
 
     /**
-     * Get detail by article slug
+     * Get detail by article slug for article detail + increase view count = 1
      * @param $slug
      * @return mixed
      */
     public function getArticleBySlug($slug)
     {
-        return $this->articleRepo->model->with(
+        $article = $this->articleRepo->model->with(
             [
+                'Category' => function($q) {
+                    $q->select('id', 'name');
+                },
                 'Author' => function($q) {
                     $q->select('id', 'username', 'avatar_id',
                         DB::raw('(select count(article.id) from article where article.author_id = users.id) as total_article'));
                 },
                 'Author.Avatar' => function($q) {
-                    $q->select('id', 'thumbnail', 'main');
+                    $q->select('id', 'main', 'thumbnail');
                 },
-                'Category'
+                'Thumbnail' => function($q) {
+                    $q->select('id', 'main', 'thumbnail');
+                },
+                'ArticleTag' => function($q) {
+                    $q->select('id', 'article_id', 'tag_id');
+                },
+                'ArticleTag.Tag' => function($q) {
+                    $q->select('id', 'name');
+                },
             ])->where('slug', $slug)->first();
+
+        if ($article) {
+            $article->view_count +=1;
+            $article->save();
+        }
+
+        return $article;
     }
 
     public function createArticle($data)
     {
-        $data['slug'] = Str::slug($data['title']);
-        $article = $this->articleRepo->create($data);
+        try {
+            DB::beginTransaction();
+            $data['slug'] = Str::slug($data['title']);
+            $tags = [];
+            if (isset($data['tags'])) {
+                $tags = $data['tags'];
+                unset($data['tags']);
+            }
 
-        return $this->getArticleById($article->id);
+            $article = $this->articleRepo->create($data);
+
+            if (count($tags) > 0) {
+                foreach ($tags as $tagName) {
+                    $tag = $this->tagRepo->checkExistOrCreate($tagName, false);
+                    $this->tagIds[] = $tag->id;
+                }
+            }
+
+            if (count($this->tagIds) > 0) {
+                $this->articleTagRepo->modifyArticleTag($article->id, $this->tagIds);
+            }
+
+            return $article;
+        } catch (\Exception $exception) {
+           DB::rollBack();
+           dd($exception->getMessage());
+           return false;
+        }
     }
 
-    public function updateArticle($id, $data)
+    public function updateArticle($articleId, $data)
     {
-        $data['slug'] = Str::slug($data['title']);
-        $article = $this->articleRepo->update($id, $data);
+        try {
+            DB::beginTransaction();
+            $data['slug'] = Str::slug($data['title']);
+            $tags = [];
+            if (isset($data['tags'])) {
+                $tags = $data['tags'];
+                unset($data['tags']);
+            }
 
-        return $this->getArticleById($article->id);
+            $article = $this->articleRepo->update($articleId, $data);
+            if (count($tags) > 0) {
+                foreach ($tags as $tagName) {
+                    $tag = $this->tagRepo->checkExistOrCreate($tagName, false);
+                    $this->tagIds[] = $tag->id;
+                }
+            }
+
+            if (count($this->tagIds) > 0) {
+                $this->articleTagRepo->modifyArticleTag($article->id, $this->tagIds);
+            }
+
+            DB::commit();
+            return $article;
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return false;
+        }
     }
 }

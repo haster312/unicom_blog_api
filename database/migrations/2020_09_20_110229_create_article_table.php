@@ -17,7 +17,9 @@ class CreateArticleTable extends Migration
             $table->id();
             $table->string('title', 100);
             $table->string('slug', 100);
+            $table->text('short_content')->nullable();
             $table->text('content');
+            $table->integer('thumbnail_id')->nullable();
             $table->integer('author_id');
             $table->integer('category_id');
             $table->integer('subcategory_id')->nullable();
@@ -30,6 +32,7 @@ class CreateArticleTable extends Migration
         Schema::table('article', function (Blueprint $table) {
             $table->foreign('author_id')->references('id')->on('users');
             $table->foreign('category_id')->references('id')->on('category');
+            $table->foreign('thumbnail_id')->references('id')->on('image');
         });
     }
 
