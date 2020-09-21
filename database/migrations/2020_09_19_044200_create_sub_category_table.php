@@ -18,7 +18,7 @@ class CreateSubCategoryTable extends Migration
             $table->string('name');
             $table->string('slug');
             $table->tinyInteger('order')->default(0);
-            $table->integer('category_id');
+            $table->unsignedInteger('category_id');
             $table->integer('created_at');
             $table->integer('updated_at');
         });
