@@ -20,12 +20,12 @@ class CreateUsersTable extends Migration
             $table->string('username')->unique();
             $table->string('email')->unique()->nullable();
             $table->string('password')->nullable();
-            $table->unsignedInteger('avatar_id')->nullable();
+            $table->unsignedBigInteger('avatar_id')->nullable();
             $table->string('social')->nullable();
             $table->string('social_id')->nullable();
             $table->string('social_token')->nullable();
-            $table->unsignedInteger('university_id')->nullable();
-            $table->unsignedInteger('course_id')->nullable();
+            $table->unsignedBigInteger('university_id')->nullable();
+            $table->unsignedBigInteger('course_id')->nullable();
             $table->integer('created_at');
             $table->integer('updated_at');
         });
