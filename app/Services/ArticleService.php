@@ -232,22 +232,12 @@ class ArticleService extends BaseService
             }
 
             $article = $this->articleRepo->create($data);
+            $this->addArticleTag($tags, $article->id);
 
-            if (count($tags) > 0) {
-                foreach ($tags as $tagName) {
-                    $tag = $this->tagRepo->checkExistOrCreate($tagName, false);
-                    $this->tagIds[] = $tag->id;
-                }
-            }
-
-            if (count($this->tagIds) > 0) {
-                $this->articleTagRepo->modifyArticleTag($article->id, $this->tagIds);
-            }
-
+            DB::commit();
             return $article;
         } catch (\Exception $exception) {
            DB::rollBack();
-           dd($exception->getMessage());
            return false;
         }
     }
@@ -264,22 +254,27 @@ class ArticleService extends BaseService
             }
 
             $article = $this->articleRepo->update($articleId, $data);
-            if (count($tags) > 0) {
-                foreach ($tags as $tagName) {
-                    $tag = $this->tagRepo->checkExistOrCreate($tagName, false);
-                    $this->tagIds[] = $tag->id;
-                }
-            }
-
-            if (count($this->tagIds) > 0) {
-                $this->articleTagRepo->modifyArticleTag($article->id, $this->tagIds);
-            }
+            $this->addArticleTag($tags, $article->id);
 
             DB::commit();
             return $article;
         } catch (\Exception $exception) {
             DB::rollBack();
             return false;
+        }
+    }
+
+    public function addArticleTag($tags, $articleId)
+    {
+        if (count($tags) > 0) {
+            foreach ($tags as $tagName) {
+                $tag = $this->tagRepo->checkExistOrCreate($tagName, false);
+                $this->tagIds[] = $tag->id;
+            }
+        }
+
+        if (count($this->tagIds) > 0) {
+            $this->articleTagRepo->modifyArticleTag($articleId, $this->tagIds);
         }
     }
 }

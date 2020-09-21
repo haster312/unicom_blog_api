@@ -16,7 +16,7 @@ class CreateTagTable extends Migration
         Schema::create('tag', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('count');
+            $table->integer('count')->default(0);
             $table->integer('created_at');
             $table->integer('updated_at');
         });
