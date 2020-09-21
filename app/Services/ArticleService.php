@@ -17,7 +17,7 @@ class ArticleService extends BaseService
     public $tagRepo;
     public $articleTagRepo;
     public $tagIds = [];
-    public $singleRelation = [];
+    public $currentArticle;
     public $categoryRelation = [];
 
     public function __construct(
@@ -49,6 +49,8 @@ class ArticleService extends BaseService
                 $q->select('id', 'name');
             }
         ];
+
+        $this->currentArticle = request('article_id') ? request('article_id') : null;
     }
 
     public function getSelfArticle($userId)
@@ -96,6 +98,10 @@ class ArticleService extends BaseService
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
+        }
+
+        if ($this->currentArticle) {
+            $query->where('id', '!=', $this->currentArticle);
         }
 
         return $query->where('status', 1)

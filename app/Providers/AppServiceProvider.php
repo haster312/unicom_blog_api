@@ -14,10 +14,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
-        header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length');
-//        header('Access-Control-Allow-Origin: http://localhost:3000');
-        header('Access-Control-Allow-Credentials: true');
+        $allowedOrigins = ['http://localhost:3000',
+            'http://staging.myunicoms.com',
+            'http://myunicoms.com',
+            'https://myunicoms.com'
+        ];
+
+        $origin = $_SERVER['HTTP_ORIGIN'];
+        if (in_array($origin, $allowedOrigins)) {
+            header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
+            header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token, Authorization, Accept,charset,boundary,Content-Length');
+            header("Access-Control-Allow-Origin: $origin");
+            header('Access-Control-Allow-Credentials: true');
+        }
     }
 
     /**
