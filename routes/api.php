@@ -46,21 +46,20 @@ Route::group(['prefix' => 'article'], function () {
     Route::get('/category/{categoryId}', [ArticleController::class, 'getListWithCategory']);
     Route::get('/slug/{slug}', [ArticleController::class, 'detailSlug']);
 
-    Route::group(['prefix' => 'popular'], function () {
-        Route::get('/most', [ArticleController::class, 'getMostPopular']);
-        Route::get('/week', [ArticleController::class, 'getWeeklyPopular']);
-        Route::get('/month', [ArticleController::class, 'getMonthlyPopular']);
-        Route::get('/feature', [ArticleController::class, 'getFeature']);
-    });
+    Route::get('/latest', [ArticleController::class, 'getLatest']);
+    Route::get('/popular/most', [ArticleController::class, 'getMostPopular']);
+    Route::get('/popular/week', [ArticleController::class, 'getWeeklyPopular']);
+    Route::get('/popular/month', [ArticleController::class, 'getMonthlyPopular']);
+    Route::get('/popular/feature', [ArticleController::class, 'getFeature']);
 
     /**
      * Article action requires authentication
      */
     Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/self', [ArticleController::class, 'getSelfArticle']);
-        Route::get('/{id}', [ArticleController::class, 'detail'])->where('id', '[0-9]+');;
+        Route::get('/{id}', [ArticleController::class, 'detail'])->where('id', '[0-9]+');
         Route::post('/', [ArticleController::class, 'new']);
-        Route::post('/{id}', [ArticleController::class, 'update']);
-        Route::delete('/{id}', [ArticleController::class, 'delete']);
+        Route::post('/{id}', [ArticleController::class, 'update'])->where('id', '[0-9]+');
+        Route::delete('/{id}', [ArticleController::class, 'delete'])->where('id', '[0-9]+');
     });
 });

@@ -41,7 +41,13 @@ class ArticleController extends Controller
 
     public function getLatest()
     {
+        try {
+            $articles = $this->articleService->getLatestArticle();
 
+            success($articles);
+        } catch (\Exception $exception) {
+            error($exception->getMessage());
+        }
     }
 
     /**
@@ -110,12 +116,19 @@ class ArticleController extends Controller
         }
 
         $article = $this->articleService->getArticleById($id, $user->id);
+        if (!$article) {
+            error(messages('NotExist'), 404);
+        }
+
         success($article);
     }
 
     public function detailSlug($slug)
     {
         $article = $this->articleService->getArticleBySlug($slug);
+        if (!$article) {
+            error(messages('NotExist'), 404);
+        }
         // Return detail
         success($article);
     }
@@ -154,8 +167,18 @@ class ArticleController extends Controller
         }
     }
 
-    public function delete()
+    public function delete($articleId)
     {
+        $article = $this->articleService->articleRepo->getModelById($articleId);
+        if (!$article) {
+            success(true);
+        }
 
+        $deleted = $this->articleService->deleteArticle($articleId);
+        if (!$deleted) {
+            error(messages('Error'));
+        }
+
+        success($deleted);
     }
 }

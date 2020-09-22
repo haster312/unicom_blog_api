@@ -14,9 +14,7 @@ class ArticleTagRepo extends BaseRepo
     public function modifyArticleTag($articleId, $tagIds = [])
     {
         if (count($tagIds) > 0) {
-            $this->deleteModelByFields([
-                ['id', 'IN', $tagIds]
-            ]);
+            $this->deleteByArticleId($articleId);
         }
 
         foreach ($tagIds as $tagId) {
@@ -27,5 +25,10 @@ class ArticleTagRepo extends BaseRepo
         }
 
         return true;
+    }
+
+    public function deleteByArticleId($articleId)
+    {
+        return $this->deleteModelByField('article_id', $articleId);
     }
 }

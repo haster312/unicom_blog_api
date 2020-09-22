@@ -53,6 +53,19 @@ class ArticleService extends BaseService
         $this->currentArticle = request('article_id') ? request('article_id') : null;
     }
 
+    public function getLatestArticle()
+    {
+        return $this->articleRepo->model
+            ->select('id', 'title', 'short_content', 'thumbnail_id',
+                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at'
+            )
+            ->where('status', 1)
+            ->with($this->categoryRelation)
+            ->orderBy('created_at', 'DESC')
+            ->limit($this->size)
+            ->get();
+    }
+
     public function getSelfArticle($userId)
     {
         $articles = $this->articleRepo->model->with([
@@ -120,6 +133,7 @@ class ArticleService extends BaseService
         $articles = $this->articleRepo->model->with($this->categoryRelation)
             ->where('category_id', $categoryId)
             ->where('status', 1)
+            ->orderBy('created_at', 'DESC')
             ->paginate($this->size);
 
         return $articles->toArray();
@@ -195,7 +209,7 @@ class ArticleService extends BaseService
                     $q->select('id', 'name');
                 },
                 'Author' => function($q) {
-                    $q->select('id', 'username', 'avatar_id',
+                    $q->select('id', 'username', 'avatar_id', 'bio',
                         DB::raw('(select count(article.id) from article where article.author_id = users.id) as total_article'));
                 },
                 'Author.Avatar' => function($q) {
@@ -233,6 +247,7 @@ class ArticleService extends BaseService
 
             $article = $this->articleRepo->create($data);
             $this->addArticleTag($tags, $article->id);
+            $article = $this->getArticleById($article->id);
 
             DB::commit();
             return $article;
@@ -255,6 +270,7 @@ class ArticleService extends BaseService
 
             $article = $this->articleRepo->update($articleId, $data);
             $this->addArticleTag($tags, $article->id);
+            $article = $this->getArticleById($articleId);
 
             DB::commit();
             return $article;
@@ -276,5 +292,15 @@ class ArticleService extends BaseService
         if (count($this->tagIds) > 0) {
             $this->articleTagRepo->modifyArticleTag($articleId, $this->tagIds);
         }
+    }
+
+    public function deleteArticle($articleId)
+    {
+        $deleted = $this->articleRepo->deleteModelByField('id', $articleId);
+        if (!$deleted) {
+            return false;
+        }
+
+        return $this->articleTagRepo->deleteByArticleId($articleId);
     }
 }
