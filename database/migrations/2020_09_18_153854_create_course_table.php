@@ -18,6 +18,7 @@ class CreateCourseTable extends Migration
             $table->string('name');
             $table->string('slug');
             $table->integer('university_id');
+            $table->text('url')->nullable();
             $table->integer('created_at');
             $table->integer('updated_at');
         });

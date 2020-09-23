@@ -16,9 +16,12 @@ class ArticleService extends BaseService
     public $articleRepo;
     public $tagRepo;
     public $articleTagRepo;
-    public $tagIds = [];
-    public $currentArticle;
-    public $categoryRelation = [];
+    private $tagIds = [];
+    private $currentArticle;
+    private $categoryRelation = [];
+    private $countComment;
+    private $countLike;
+    private $isLike;
 
     public function __construct(
         ArticleRepo $articleRepo,
@@ -31,10 +34,10 @@ class ArticleService extends BaseService
         $this->articleTagRepo = $articleTagRepo;
         $this->categoryRelation = [
             'Category' => function($q) {
-                $q->select('id', 'name');
+                $q->select('id', 'name', 'slug');
             },
             'Author' => function($q) {
-                $q->select('id', 'first_name', 'last_name');
+                $q->select('id', 'first_name', 'last_name', 'username');
             },
             'Author.Avatar' => function($q) {
                 $q->select('id', 'main', 'thumbnail');
@@ -46,11 +49,16 @@ class ArticleService extends BaseService
                 $q->select('id', 'article_id', 'tag_id');
             },
             'ArticleTag.Tag' => function($q) {
-                $q->select('id', 'name');
+                $q->select('id', 'name', 'count');
             }
         ];
 
         $this->currentArticle = request('article_id') ? request('article_id') : null;
+        $this->countComment = DB::raw('(select count(article_comment.id) from article_comment where article_id = article.id) as comment_count');
+        $this->countLike = DB::raw('(select count(article_like.id) from article_like where article_id = article.id) as like_count');
+        $this->isLike = DB::raw('(select article_like.id from article_like
+                                        where article_id = article.id and article_like.user_id = ? and article_like.status = 1)
+                                        as is_like');
     }
 
     public function getLatestArticle()
@@ -70,7 +78,7 @@ class ArticleService extends BaseService
     {
         $articles = $this->articleRepo->model->with([
                     'Category' => function($q) {
-                        $q->select('id', 'name');
+                        $q->select('id', 'name', 'slug');
                     },
                     'Thumbnail' => function($q) {
                         $q->select('id', 'main', 'thumbnail');
@@ -79,7 +87,7 @@ class ArticleService extends BaseService
                         $q->select('id', 'article_id', 'tag_id');
                     },
                     'ArticleTag.Tag' => function($q) {
-                        $q->select('id', 'name');
+                        $q->select('id', 'name', 'count');
                     }
                 ])->where('author_id', $userId)->orderBy('created_at', 'DESC')->paginate($this->size);
 
@@ -182,7 +190,7 @@ class ArticleService extends BaseService
                         $q->select('id', 'article_id', 'tag_id');
                     },
                     'ArticleTag.Tag' => function($q) {
-                        $q->select('id', 'name');
+                        $q->select('id', 'name', 'count');
                     },
                     'Thumbnail' => function($q) {
                         $q->select('id', 'main', 'thumbnail');
@@ -199,11 +207,12 @@ class ArticleService extends BaseService
     /**
      * Get detail by article slug for article detail + increase view count = 1
      * @param $slug
+     * @param $userId
      * @return mixed
      */
-    public function getArticleBySlug($slug)
+    public function getArticleBySlug($slug, $userId = null)
     {
-        $article = $this->articleRepo->model->with(
+        $query = $this->articleRepo->model->with(
             [
                 'Category' => function($q) {
                     $q->select('id', 'name');
@@ -219,12 +228,26 @@ class ArticleService extends BaseService
                     $q->select('id', 'main', 'thumbnail');
                 },
                 'ArticleTag' => function($q) {
-                    $q->select('id', 'article_id', 'tag_id');
+                    $q->select('article_tag.id', 'article_id', 'tag_id');
+                    $q->leftJoin('tag', 'tag.id', 'article_tag.tag_id');
+                    $q->orderBy('count', 'DESC');
                 },
                 'ArticleTag.Tag' => function($q) {
-                    $q->select('id', 'name');
+                    $q->select('id', 'name', 'count');
                 },
-            ])->where('slug', $slug)->first();
+            ]);
+
+
+        if ($userId) {
+            $query->select('*', $this->countComment, $this->countLike, $this->isLike);
+            $query->where('slug', '?');
+            $query->setBindings([$userId, $slug]);
+        } else {
+            $query->select('*', $this->countComment, $this->countLike);
+            $query->where('slug', $slug);
+        }
+
+        $article = $query->first();
 
         if ($article) {
             $article->view_count +=1;
@@ -301,6 +324,7 @@ class ArticleService extends BaseService
             return false;
         }
 
-        return $this->articleTagRepo->deleteByArticleId($articleId);
+        $this->articleTagRepo->deleteByArticleId($articleId);
+        return true;
     }
 }

@@ -50,7 +50,7 @@ class AuthController extends Controller
         $user = $this->authService->doLogin($data['email'], $data['password']);
 
         if (!$user) {
-            error(messages('WrongCredential'), 401);
+            error(messages('WrongCredential'), 403);
         }
 
         success($user);

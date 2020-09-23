@@ -123,12 +123,16 @@ class ArticleController extends Controller
         success($article);
     }
 
-    public function detailSlug($slug)
+    public function detailSlug(Request $request, $slug)
     {
-        $article = $this->articleService->getArticleBySlug($slug);
+        $data = getData($request);
+        $userId = isset($data['user_id']) ? $data['user_id'] : null;
+
+        $article = $this->articleService->getArticleBySlug($slug, $userId);
         if (!$article) {
             error(messages('NotExist'), 404);
         }
+
         // Return detail
         success($article);
     }
