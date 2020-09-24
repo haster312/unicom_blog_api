@@ -12,6 +12,8 @@ class Article extends Model
     protected $fillable = ['title', 'short_content', 'slug', 'content', 'author_id',
         'category_id', 'subcategory_id', 'status', 'thumbnail_id'];
 
+    public $searchable = ['short_content', 'content'];
+
     public function Author()
     {
         return $this->belongsTo(User::class, 'author_id', 'id');
@@ -27,7 +29,7 @@ class Article extends Model
         return $this->hasMany(ArticleTag::class, 'article_id', 'id');
     }
 
-    public function Thumbnail()
+    public function Cover()
     {
         return $this->belongsTo(Image::class, 'thumbnail_id', 'id');
     }

@@ -59,10 +59,10 @@ class AuthController extends Controller
     public function logout()
     {
         if (auth()->check()) {
-            auth()->user()->AuthAcessToken()->delete();
+            auth()->user()->token()->revoke();
             success(true);
         }
 
-        error(false);
+        error(messages('Error'), 401);
     }
 }

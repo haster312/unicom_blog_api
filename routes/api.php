@@ -10,10 +10,10 @@ use App\Http\Controllers\API\ArticleController;
 use App\Http\Controllers\API\ArticleActionController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\TagController;
-
+use App\Http\Controllers\API\SearchController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:api']);
 Route::post('/forget-password', [AuthController::class, 'forgetPassword']);
 
 /**
@@ -67,7 +67,7 @@ Route::group(['prefix' => 'article'], function () {
 
     Route::group(['middleware' => ['auth:api']], function () {
         Route::post('/like', [ArticleActionController::class, 'likeArticle']);
-        Route::get('/{articleId}/comment', [ArticleActionController::class, 'getComment'])->where('articleId', '[0-9]+');
+        Route::get('/comment', [ArticleActionController::class, 'getComment']);
         Route::post('/comment', [ArticleActionController::class, 'commentArticle']);
         Route::delete('/comment/{id}', [ArticleActionController::class, 'deleteComment']);
     });
@@ -76,3 +76,9 @@ Route::group(['prefix' => 'article'], function () {
 Route::group(['prefix' => 'tag'], function() {
     Route::get('/cloud', [TagController::class, 'getFooterTag']);
 });
+
+Route::group(['prefix' => 'search'], function() {
+    Route::get('/', [SearchController::class, 'searchArticle']);
+    Route::get('/advanced', [SearchController::class, 'advancedSearchArticle']);
+});
+

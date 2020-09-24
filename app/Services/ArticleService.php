@@ -42,7 +42,7 @@ class ArticleService extends BaseService
             'Author.Avatar' => function($q) {
                 $q->select('id', 'main', 'thumbnail');
             },
-            'Thumbnail' => function($q) {
+            'Cover' => function($q) {
                 $q->select('id', 'main', 'thumbnail');
             },
             'ArticleTag' => function($q) {
@@ -80,7 +80,7 @@ class ArticleService extends BaseService
                     'Category' => function($q) {
                         $q->select('id', 'name', 'slug');
                     },
-                    'Thumbnail' => function($q) {
+                    'Cover' => function($q) {
                         $q->select('id', 'main', 'thumbnail');
                     },
                     'ArticleTag' => function($q) {
@@ -181,7 +181,7 @@ class ArticleService extends BaseService
         $query = $this->articleRepo->model->with(
                 [
                     'Category' => function($q) {
-                        $q->select('id', 'name');
+                        $q->select('id', 'name', 'slug');
                     },
                     'Author' => function($q) {
                         $q->select('id', 'first_name', 'last_name');
@@ -192,7 +192,7 @@ class ArticleService extends BaseService
                     'ArticleTag.Tag' => function($q) {
                         $q->select('id', 'name', 'count');
                     },
-                    'Thumbnail' => function($q) {
+                    'Cover' => function($q) {
                         $q->select('id', 'main', 'thumbnail');
                     },
                 ]);
@@ -215,7 +215,7 @@ class ArticleService extends BaseService
         $query = $this->articleRepo->model->with(
             [
                 'Category' => function($q) {
-                    $q->select('id', 'name');
+                    $q->select('id', 'name', 'slug');
                 },
                 'Author' => function($q) {
                     $q->select('id', 'username', 'avatar_id', 'bio',
@@ -224,7 +224,7 @@ class ArticleService extends BaseService
                 'Author.Avatar' => function($q) {
                     $q->select('id', 'main', 'thumbnail');
                 },
-                'Thumbnail' => function($q) {
+                'Cover' => function($q) {
                     $q->select('id', 'main', 'thumbnail');
                 },
                 'ArticleTag' => function($q) {

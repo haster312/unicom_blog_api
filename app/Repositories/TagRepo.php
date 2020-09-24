@@ -11,6 +11,15 @@ class TagRepo extends BaseRepo
         return Tag::class;
     }
 
+    public function getIdByTagName($tags)
+    {
+        $ids = $this->model->select('id')->whereIn('name', $tags)->get();
+        if ($ids)
+            return $ids->toArray();
+        else
+            return [];
+    }
+
     public function checkExistOrCreate($tagName, $update = true)
     {
         $tagName = trim($tagName);

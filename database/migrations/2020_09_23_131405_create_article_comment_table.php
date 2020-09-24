@@ -18,6 +18,7 @@ class CreateArticleCommentTable extends Migration
             $table->unsignedBigInteger('article_id');
             $table->unsignedBigInteger('user_id');
             $table->text('content');
+            $table->unsignedBigInteger('parent');
             $table->integer('created_at');
             $table->integer('updated_at');
         });

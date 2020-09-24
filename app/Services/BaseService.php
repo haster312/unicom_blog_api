@@ -14,9 +14,22 @@ class BaseService
 
     public function __construct()
     {
-        $this->page = \request()->query('page') ? \request()->query('page') : 1;
-        $this->size = \request()->query('size') ? \request()->query('size') : 10;
-        $this->key = \request()->query('key') ? \request()->query('key') : null;
+        $this->getParams();
         $this->cacheHelper = new CacheHelper();
+    }
+
+    public function getParams()
+    {
+        $this->page = \request()->query('page') ? \request()->query('page') : 1;
+        if (!is_numeric($this->page)) {
+            error('Page must be a number');
+        }
+        $this->size = \request()->query('size') ? \request()->query('size') : 10;
+        if (!is_numeric($this->size)) {
+            error('Size must be a number');
+        }
+
+        $this->key = \request()->query('key') ? \request()->query('key') : null;
+        $this->key = strip_tags($this->key);
     }
 }

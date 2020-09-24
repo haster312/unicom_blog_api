@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Route;
 
 
-class ArticleLikeRequest extends FormRequest
+class ArticleCommentRequest extends FormRequest
 {
     protected $type;
 
@@ -35,7 +35,8 @@ class ArticleLikeRequest extends FormRequest
     public function rules()
     {
         return [
-            'article_id' => 'required'
+            'article_id' => 'required',
+            'content' => 'required|max:300'
         ];
     }
 }
