@@ -19,7 +19,7 @@ class CreateArticleTable extends Migration
             $table->string('slug', 100);
             $table->text('short_content')->nullable();
             $table->text('content');
-            $table->unsignedBigInteger('thumbnail_id')->nullable();
+            $table->unsignedBigInteger('cover_id')->nullable();
             $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('subcategory_id')->nullable();

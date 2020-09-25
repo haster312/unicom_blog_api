@@ -10,7 +10,7 @@ class Article extends Model
     use Base;
     protected $table = 'article';
     protected $fillable = ['title', 'short_content', 'slug', 'content', 'author_id',
-        'category_id', 'subcategory_id', 'status', 'thumbnail_id'];
+        'category_id', 'subcategory_id', 'status', 'thumbnail_id', 'cover_id'];
 
     public $searchable = ['short_content', 'content'];
 
@@ -31,7 +31,7 @@ class Article extends Model
 
     public function Cover()
     {
-        return $this->belongsTo(Image::class, 'thumbnail_id', 'id');
+        return $this->belongsTo(Image::class, 'cover_id', 'id');
     }
 
     public function setContentAttribute($value)
