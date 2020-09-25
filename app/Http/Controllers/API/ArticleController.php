@@ -44,7 +44,7 @@ class ArticleController extends Controller
         try {
             $articles = $this->articleService->getLatestArticle();
 
-            success($articles);
+            paging($articles);
         } catch (\Exception $exception) {
             error($exception->getMessage());
         }
@@ -164,6 +164,18 @@ class ArticleController extends Controller
 
         try {
             $article = $this->articleService->updateArticle($id, $data);
+
+            success($article);
+        } catch (\Exception $exception) {
+            error($exception->getMessage());
+        }
+    }
+
+    public function publishArticle(Request $request, $id)
+    {
+        $data = getData($request);
+        try {
+            $article = $this->articleService->publishArticle($id, $data['status']);
 
             success($article);
         } catch (\Exception $exception) {

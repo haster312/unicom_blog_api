@@ -4,15 +4,18 @@
 namespace App\Services;
 
 
+use App\Repositories\UserProfileRepo;
 use App\Repositories\UserRepo;
 
 class UserService
 {
     public $userRepo;
+    public $userProfileRepo;
 
-    public function __construct(UserRepo $userRepo)
+    public function __construct(UserRepo $userRepo, UserProfileRepo $userProfileRepo)
     {
         $this->userRepo = $userRepo;
+        $this->userProfileRepo = $userProfileRepo;
     }
 
     /**
@@ -22,11 +25,19 @@ class UserService
      */
     public function createUser($data)
     {
-        if (!isset($data['username'])) {
-            $data['username'] = $data['last_name'] . $data['first_name'];
+        $profile = $data['profile'];
+        unset($data['profile']);
+
+        $user = $this->userRepo->create($data);
+        if (!$user) {
+            return false;
         }
 
-        return $this->userRepo->create($data);
+        $profile['user_id'] = $user->id;
+
+        $profile = $this->userProfileRepo->create($profile);
+
+        return $this->getUserDetail($user->id);
     }
 
     public function getUserDetail($userId)
@@ -41,7 +52,8 @@ class UserService
                             },
                             'Course' => function($q) {
                                 $q->select('id', 'name');
-                            }
+                            },
+                            'Profile'
                         ])
                         ->where('id', $userId)
                         ->first();

@@ -61,6 +61,7 @@ Route::group(['prefix' => 'article'], function () {
         Route::get('/self', [ArticleController::class, 'getSelfArticle']);
         Route::get('/{id}', [ArticleController::class, 'detail'])->where('id', '[0-9]+');
         Route::post('/', [ArticleController::class, 'new']);
+        Route::post('/status/{id}', [ArticleController::class, 'publishArticle'])->where('id', '[0-9]+');
         Route::post('/{id}', [ArticleController::class, 'update'])->where('id', '[0-9]+');
         Route::delete('/{id}', [ArticleController::class, 'delete'])->where('id', '[0-9]+');
     });

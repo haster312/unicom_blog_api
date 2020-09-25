@@ -55,7 +55,7 @@ class ArticleService extends BaseService
 
         $this->currentArticle = request('article_id') ? request('article_id') : null;
         $this->countComment = DB::raw('(select count(article_comment.id) from article_comment where article_id = article.id) as comment_count');
-        $this->countLike = DB::raw('(select count(article_like.id) from article_like where article_id = article.id) as like_count');
+        $this->countLike = DB::raw('(select count(article_like.id) from article_like where article_id = article.id and article_like.status = 1) as like_count');
         $this->isLike = DB::raw('(select article_like.id from article_like
                                         where article_id = article.id and article_like.user_id = ? and article_like.status = 1)
                                         as is_like');
@@ -63,40 +63,52 @@ class ArticleService extends BaseService
 
     public function getLatestArticle()
     {
-        return $this->articleRepo->model
-            ->select('id', 'title', 'short_content', 'thumbnail_id',
-                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at'
+        $articles = $this->articleRepo->model
+            ->select('id', 'title', 'short_content', 'thumbnail_id', 'slug',
+                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
+                $this->countLike
             )
             ->where('status', 1)
             ->with($this->categoryRelation)
             ->orderBy('created_at', 'DESC')
-            ->limit($this->size)
-            ->get();
+            ->paginate($this->size);
+
+        return $articles->toArray();
     }
 
     public function getSelfArticle($userId)
     {
-        $articles = $this->articleRepo->model->with([
-                    'Category' => function($q) {
-                        $q->select('id', 'name', 'slug');
-                    },
-                    'Cover' => function($q) {
-                        $q->select('id', 'main', 'thumbnail');
-                    },
-                    'ArticleTag' => function($q) {
-                        $q->select('id', 'article_id', 'tag_id');
-                    },
-                    'ArticleTag.Tag' => function($q) {
-                        $q->select('id', 'name', 'count');
-                    }
-                ])->where('author_id', $userId)->orderBy('created_at', 'DESC')->paginate($this->size);
+        $articles = $this->articleRepo->model
+                    ->select('id', 'title', 'short_content', 'thumbnail_id', 'slug',
+                        'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
+                        $this->countLike
+                    )
+                    ->with([
+                        'Category' => function($q) {
+                            $q->select('id', 'name', 'slug');
+                        },
+                        'Cover' => function($q) {
+                            $q->select('id', 'main', 'thumbnail');
+                        },
+                        'ArticleTag' => function($q) {
+                            $q->select('id', 'article_id', 'tag_id');
+                        },
+                        'ArticleTag.Tag' => function($q) {
+                            $q->select('id', 'name', 'count');
+                        }
+                    ])->where('author_id', $userId)->orderBy('created_at', 'DESC')->paginate($this->size);
 
         return $articles->toArray();
     }
 
     public function getPopularByPeriod($categoryId = null, $type = null)
     {
-        $query = $this->articleRepo->model->with($this->categoryRelation);
+        $query = $this->articleRepo->model
+            ->select('id', 'title', 'short_content', 'thumbnail_id', 'slug',
+                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
+                $this->countLike
+            )
+            ->with($this->categoryRelation);
 
         switch ($type) {
             case 'week':
@@ -150,6 +162,10 @@ class ArticleService extends BaseService
     public function getFeatureArticle()
     {
         return $this->articleRepo->model
+            ->select('id', 'title', 'short_content', 'thumbnail_id', 'slug',
+                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
+                $this->countLike
+            )
             ->with($this->categoryRelation)
             ->where('status', 1)
             ->orderBy('view_count', 'DESC')
@@ -315,6 +331,17 @@ class ArticleService extends BaseService
         if (count($this->tagIds) > 0) {
             $this->articleTagRepo->modifyArticleTag($articleId, $this->tagIds);
         }
+    }
+
+    public function publishArticle($articleId, $status)
+    {
+        $article = $this->articleRepo->getModelById($articleId);
+        if (!$article) {
+            return false;
+        }
+
+        $this->articleRepo->update($articleId, ['status' => $status]);
+        return $this->getArticleById($articleId);
     }
 
     public function deleteArticle($articleId)

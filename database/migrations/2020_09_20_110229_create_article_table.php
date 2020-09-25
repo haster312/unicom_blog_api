@@ -35,7 +35,7 @@ class CreateArticleTable extends Migration
             $table->foreign('thumbnail_id')->references('id')->on('image');
         });
 
-        \Illuminate\Support\Facades\DB::statement('ALTER TABLE article ADD FULLTEXT fulltext_index (title, short_content, content)');
+        \Illuminate\Support\Facades\DB::statement('ALTER TABLE article ADD FULLTEXT fulltext_index (short_content, content)');
     }
 
     /**

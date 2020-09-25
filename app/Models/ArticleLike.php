@@ -9,5 +9,5 @@ class ArticleLike extends Model
 {
     use Base;
     protected $table = 'article_like';
-    protected $fillable = ['article_id', 'user_id'];
+    protected $fillable = ['article_id', 'user_id', 'status'];
 }

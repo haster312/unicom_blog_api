@@ -48,12 +48,14 @@ class AuthController extends Controller
     {
         $data = getData($request);
         $user = $this->authService->doLogin($data['email'], $data['password']);
+        $detail = $this->userService->getUserDetail($user->id);
+        $detail->token = $user->token;
 
-        if (!$user) {
+        if (!$detail) {
             error(messages('WrongCredential'), 403);
         }
 
-        success($user);
+        success($detail);
     }
 
     public function logout()
