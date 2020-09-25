@@ -150,7 +150,12 @@ class ArticleService extends BaseService
      */
     public function getArticlesByCategory($categoryId)
     {
-        $articles = $this->articleRepo->model->with($this->categoryRelation)
+        $articles = $this->articleRepo->model
+            ->select('id', 'title', 'short_content', 'cover_id', 'slug',
+                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
+                $this->countLike
+            )
+            ->with($this->categoryRelation)
             ->where('category_id', $categoryId)
             ->where('status', 1)
             ->orderBy('created_at', 'DESC')
