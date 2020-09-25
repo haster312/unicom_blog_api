@@ -17,6 +17,12 @@ class ArticleController extends Controller
         $this->articleService = $articleService;
     }
 
+    public function allArticleWithSlug()
+    {
+        $articles = $this->articleService->articleRepo->model->select('slug')->get();
+        success($articles);
+    }
+
     public function getSelfArticle()
     {
         $this->getUser($user);

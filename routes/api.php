@@ -45,6 +45,7 @@ Route::group(['prefix' => 'category'], function () {
 });
 
 Route::group(['prefix' => 'article'], function () {
+    Route::get('/all', [ArticleController::class, 'allArticleWithSlug']);
     Route::get('/category/{categoryId}', [ArticleController::class, 'getListWithCategory']);
     Route::get('/slug/{slug}', [ArticleController::class, 'detailSlug']);
 
