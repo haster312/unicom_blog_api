@@ -64,7 +64,7 @@ class ArticleService extends BaseService
     public function getLatestArticle()
     {
         $articles = $this->articleRepo->model
-            ->select('id', 'title', 'short_content', 'thumbnail_id', 'slug',
+            ->select('id', 'title', 'short_content', 'cover_id', 'slug',
                 'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
                 $this->countLike
             )
@@ -79,7 +79,7 @@ class ArticleService extends BaseService
     public function getSelfArticle($userId)
     {
         $articles = $this->articleRepo->model
-                    ->select('id', 'title', 'short_content', 'thumbnail_id', 'slug',
+                    ->select('id', 'title', 'short_content', 'cover_id', 'slug',
                         'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
                         $this->countLike
                     )
@@ -104,7 +104,7 @@ class ArticleService extends BaseService
     public function getPopularByPeriod($categoryId = null, $type = null)
     {
         $query = $this->articleRepo->model
-            ->select('id', 'title', 'short_content', 'thumbnail_id', 'slug',
+            ->select('id', 'title', 'short_content', 'cover_id', 'slug',
                 'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
                 $this->countLike
             )
@@ -162,7 +162,7 @@ class ArticleService extends BaseService
     public function getFeatureArticle()
     {
         return $this->articleRepo->model
-            ->select('id', 'title', 'short_content', 'thumbnail_id', 'slug',
+            ->select('id', 'title', 'short_content', 'cover_id', 'slug',
                 'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
                 $this->countLike
             )
