@@ -15,7 +15,7 @@ class CreateUserProfileTable extends Migration
     {
         Schema::create('user_profile', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->tinyInteger('profile_type');
             $table->string('job_title')->nullable();
             $table->string('company')->nullable();
@@ -25,7 +25,7 @@ class CreateUserProfileTable extends Migration
         });
 
         Schema::table('user_profile', function (Blueprint $table) {
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
         });
     }
 
