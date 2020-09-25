@@ -25,7 +25,7 @@ class CreateUserProfileTable extends Migration
         });
 
         Schema::table('user_profile', function (Blueprint $table) {
-            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
