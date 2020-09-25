@@ -47,8 +47,8 @@ class SearchService extends BaseService
                     'ArticleTag.Tag' => function($q) {
                         $q->select('id', 'name', 'count');
                     }
-            ])->select('article.id', 'title', 'author_id', 'slug', 'category_id', 'status', 'short_content', 'content', 'slug', 'thumbnail_id'
-                        ,'view_count', 'article.created_at');
+            ])->select('article.id', 'title', 'author_id', 'slug', 'category_id', 'status', 'short_content',
+            'content', 'slug','view_count', 'article.created_at', 'cover_id');
         // Only published
         $query->where('status', 1);
 

@@ -45,8 +45,9 @@ class ImageService
                 $imageData['thumbnail'],
                 $imageData['mime']
             );
+
             $data['mime'] = $imageData['mime'];
-            
+
             if (!$data['main'] && !$data['thumbnail']) {
                 return null;
             }
