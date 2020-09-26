@@ -6,15 +6,21 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ArticleRequest;
 use App\Services\ArticleService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
+use function Symfony\Component\String\u;
 
 class ArticleController extends Controller
 {
     private $articleService;
-
-    public function __construct(ArticleService $articleService)
+    private $userService;
+    public function __construct(
+        ArticleService $articleService,
+        UserService $userService
+    )
     {
         $this->articleService = $articleService;
+        $this->userService = $userService;
     }
 
     public function allArticleWithSlug()
@@ -28,6 +34,22 @@ class ArticleController extends Controller
         $this->getUser($user);
         $articles = $this->articleService->getSelfArticle($user->id);
 
+        paging($articles);
+    }
+
+    public function getUserArticle(Request $request)
+    {
+        $data = getData($request);
+        if (!isset($data['username'])) {
+            error(messages('NotExist'), 404);
+        }
+
+        $user = $this->userService->userRepo->getModelByField('username', trim($data['username']), true);
+        if (!$user) {
+            error(messages('NotExist'), 404);
+        }
+
+        $articles = $this->articleService->getSelfArticle($user->id, false);
         paging($articles);
     }
 

@@ -20,6 +20,6 @@ class CategoryService
 
     public function getCategory()
     {
-        return $this->categoryRepo->model->orderBy('name', 'ASC')->orderBy('order', 'ASC')->get();
+        return $this->categoryRepo->model->orderBy('order', 'ASC')->get();
     }
 }

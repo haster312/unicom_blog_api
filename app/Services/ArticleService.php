@@ -76,9 +76,9 @@ class ArticleService extends BaseService
         return $articles->toArray();
     }
 
-    public function getSelfArticle($userId)
+    public function getSelfArticle($userId, $public = true)
     {
-        $articles = $this->articleRepo->model
+        $query = $this->articleRepo->model
                     ->select('id', 'title', 'short_content', 'cover_id', 'slug',
                         'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
                         $this->countLike
@@ -96,7 +96,13 @@ class ArticleService extends BaseService
                         'ArticleTag.Tag' => function($q) {
                             $q->select('id', 'name', 'count');
                         }
-                    ])->where('author_id', $userId)->orderBy('created_at', 'DESC')->paginate($this->size);
+                    ])->where('author_id', $userId);
+
+        if (!$public) {
+            $query->where('status', 1);
+        }
+
+        $articles = $query->orderBy('created_at', 'DESC')->paginate($this->size);
 
         return $articles->toArray();
     }

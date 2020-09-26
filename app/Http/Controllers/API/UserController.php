@@ -26,6 +26,12 @@ class UserController extends Controller
         success($user);
     }
 
+    public function getDetailByUsername($username)
+    {
+        $user = $this->userService->getUserByUsername($username);
+        success($user);
+    }
+
     public function update(UpdateUserRequest $request)
     {
         $this->getUser($user);

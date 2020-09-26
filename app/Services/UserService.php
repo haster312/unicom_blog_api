@@ -47,16 +47,24 @@ class UserService
                             'Avatar' => function($q) {
                                 $q->select('id', 'main', 'thumbnail');
                             },
-                            'University' => function($q) {
-                                $q->select('id', 'name');
-                            },
-                            'Course' => function($q) {
-                                $q->select('id', 'name');
-                            },
                             'Profile'
                         ])
                         ->where('id', $userId)
                         ->first();
+    }
+
+    public function getUserByUsername($username)
+    {
+        return $this->userRepo->model
+            ->select('id', 'first_name', 'last_name', 'username', 'bio', 'avatar_id')
+            ->with([
+                'Avatar' => function($q) {
+                    $q->select('id', 'main', 'thumbnail');
+                },
+                'Profile'
+            ])
+            ->where('username', $username)
+            ->first();
     }
 
     public function updateUserDetail($userId, $data)

@@ -32,10 +32,15 @@ Route::group(['prefix' => 'university'], function () {
     Route::get('/course', [UniversityController::class, 'getCourse']);
 });
 
-Route::group(['prefix' => 'user', 'middleware' => ['auth:api']], function () {
-    Route::get('/', [UserController::class, 'detail']);
-    Route::post('/update', [UserController::class, 'update']);
-    Route::post('/password/change', [UserController::class, 'changePassword']);
+Route::group(['prefix' => 'user'], function () {
+
+    Route::group(['middleware' => ['auth:api']], function () {
+        Route::get('/', [UserController::class, 'detail']);
+        Route::post('/update', [UserController::class, 'update']);
+        Route::post('/password/change', [UserController::class, 'changePassword']);
+    });
+
+    Route::get('/{username}', [UserController::class, 'getDetailByUsername']);
 });
 
 Route::group(['prefix' => 'category'], function () {
@@ -48,7 +53,7 @@ Route::group(['prefix' => 'article'], function () {
     Route::get('/all', [ArticleController::class, 'allArticleWithSlug']);
     Route::get('/category/{categoryId}', [ArticleController::class, 'getListWithCategory']);
     Route::get('/slug/{slug}', [ArticleController::class, 'detailSlug']);
-
+    Route::get('/user', [ArticleController::class, 'getUserArticle']);
     Route::get('/latest', [ArticleController::class, 'getLatest']);
     Route::get('/popular/most', [ArticleController::class, 'getMostPopular']);
     Route::get('/popular/week', [ArticleController::class, 'getWeeklyPopular']);
