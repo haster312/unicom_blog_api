@@ -239,7 +239,7 @@ class ArticleService extends BaseService
                     $q->select('id', 'name', 'slug');
                 },
                 'Author' => function($q) {
-                    $q->select('id', 'username', 'avatar_id', 'bio',
+                    $q->select('id', 'username', 'avatar_id', 'bio', 'first_name', 'last_name',
                         DB::raw('(select count(article.id) from article where article.author_id = users.id) as total_article'));
                 },
                 'Author.Avatar' => function($q) {
