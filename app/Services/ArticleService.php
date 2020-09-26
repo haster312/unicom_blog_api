@@ -65,7 +65,7 @@ class ArticleService extends BaseService
     {
         $articles = $this->articleRepo->model
             ->select('id', 'title', 'short_content', 'cover_id', 'slug',
-                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
+                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at', 'updated_at',
                 $this->countLike
             )
             ->where('status', 1)
@@ -80,7 +80,7 @@ class ArticleService extends BaseService
     {
         $query = $this->articleRepo->model
                     ->select('id', 'title', 'short_content', 'cover_id', 'slug',
-                        'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
+                        'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at', 'updated_at',
                         $this->countLike
                     )
                     ->with([
@@ -111,7 +111,7 @@ class ArticleService extends BaseService
     {
         $query = $this->articleRepo->model
             ->select('id', 'title', 'short_content', 'cover_id', 'slug',
-                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
+                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at', 'updated_at',
                 $this->countLike
             )
             ->with($this->categoryRelation);
@@ -158,7 +158,7 @@ class ArticleService extends BaseService
     {
         $articles = $this->articleRepo->model
             ->select('id', 'title', 'short_content', 'cover_id', 'slug',
-                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
+                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at', 'updated_at',
                 $this->countLike
             )
             ->with($this->categoryRelation)
@@ -174,7 +174,7 @@ class ArticleService extends BaseService
     {
         return $this->articleRepo->model
             ->select('id', 'title', 'short_content', 'cover_id', 'slug',
-                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at',
+                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'created_at', 'updated_at',
                 $this->countLike
             )
             ->with($this->categoryRelation)
