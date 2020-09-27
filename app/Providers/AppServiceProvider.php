@@ -14,11 +14,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $allowedOrigins = ['http://localhost:3000',
+        $allowedOrigins = ['http://localhost:3000', 'https://localhost:3000',
             'http://staging.myunicoms.com',
             'https://staging.myunicoms.com',
             'http://myunicoms.com',
-            'https://myunicoms.com'
+            'https://myunicoms.com',
+            'http://www.myunicoms.com',
+            'https://www.myunicoms.com'
         ];
 
         $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : null;
