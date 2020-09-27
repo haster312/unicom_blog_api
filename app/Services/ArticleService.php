@@ -84,6 +84,9 @@ class ArticleService extends BaseService
                         $this->countLike
                     )
                     ->with([
+                        'Author' => function($q) {
+                            $q->select('id', 'first_name', 'last_name', 'username');
+                        },
                         'Category' => function($q) {
                             $q->select('id', 'name', 'slug');
                         },
