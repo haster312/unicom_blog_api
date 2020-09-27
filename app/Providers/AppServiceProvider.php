@@ -16,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $allowedOrigins = ['http://localhost:3000',
             'http://staging.myunicoms.com',
+            'https://staging.myunicoms.com',
             'http://myunicoms.com',
             'https://myunicoms.com'
         ];
