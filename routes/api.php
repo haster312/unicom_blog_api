@@ -11,7 +11,9 @@ use App\Http\Controllers\API\ArticleActionController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\TagController;
 use App\Http\Controllers\API\SearchController;
+
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register/social', [AuthController::class, 'socialRegister']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth:api']);
 Route::post('/forget-password', [AuthController::class, 'forgetPassword']);

@@ -7,6 +7,8 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Services\AuthService;
 use App\Services\UserService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use function Symfony\Component\String\u;
 
 class AuthController extends Controller
@@ -40,6 +42,22 @@ class AuthController extends Controller
         }
     }
 
+    public function socialRegister(Request $request)
+    {
+        $data = getData($request);
+        $data['profile'] = [
+            'profile_type' => 2
+        ];
+
+        $user = $this->userService->createSocialUser($data);
+        if (!$user) {
+            error(messages('Error'));
+        }
+
+        $user = $this->authService->loginByUser($user);
+
+        success($user);
+    }
 
     /**
      * @param LoginRequest $request

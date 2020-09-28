@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->text('bio')->nullable();
             $table->string('social')->nullable();
             $table->string('social_id')->nullable();
-            $table->string('social_token')->nullable();
+            $table->text('social_token')->nullable();
             $table->unsignedBigInteger('university_id')->nullable();
             $table->unsignedBigInteger('course_id')->nullable();
             $table->integer('created_at');
