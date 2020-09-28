@@ -8,5 +8,10 @@ return [
         'KEY' => env('S3_KEY', ''),
         'SECRET' => env('S3_SECRET', ''),
         'BUCKET' => env('S3_BUCKET', ''),
+    ],
+    "NOTI" => [
+        "LIKE" => 1,
+        "COMMENT" => 2,
+        "FOLLOW" => 3
     ]
 ];

@@ -68,6 +68,7 @@ class UserService
             }
 
             $profile['user_id'] = $user->id;
+            $profile['profile_type'] = 2;
             $this->userProfileRepo->create($profile);
             if ($data['image_url']) {
                 $image = $this->imageRepo->create([

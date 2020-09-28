@@ -11,6 +11,7 @@ use App\Http\Controllers\API\ArticleActionController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\TagController;
 use App\Http\Controllers\API\SearchController;
+use App\Http\Controllers\API\NotificationController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/register/social', [AuthController::class, 'socialRegister']);
@@ -91,3 +92,7 @@ Route::group(['prefix' => 'search'], function() {
     Route::get('/advanced', [SearchController::class, 'advancedSearchArticle']);
 });
 
+Route::group(['prefix' => 'notification', 'middleware' => ['auth:api']], function() {
+    Route::get('/', [NotificationController::class, 'getNotification']);
+    Route::post('/{id}', [NotificationController::class, 'seenNotification'])->where('id', '[0-9]+');
+});

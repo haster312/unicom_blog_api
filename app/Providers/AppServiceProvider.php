@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\ArticleComment;
+use App\Models\ArticleLike;
+use App\Models\Image;
+use App\Observers\CommentObserver;
+use App\Observers\ImageObserver;
+use App\Observers\LikeObserver;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -31,6 +37,8 @@ class AppServiceProvider extends ServiceProvider
             header("Access-Control-Allow-Origin: $origin");
             header('Access-Control-Allow-Credentials: true');
         }
+
+
     }
 
     /**
@@ -40,6 +48,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        ArticleLike::observe(LikeObserver::class);
+        ArticleComment::observe(CommentObserver::class);
         Schema::defaultStringLength(200);
     }
 }
