@@ -25,7 +25,7 @@ class CreateNotificationTable extends Migration
             $table->integer('updated_at');
         });
 
-        Schema::table('user_profile', function (Blueprint $table) {
+        Schema::table('notification', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('target_id')->references('id')->on('users');
             $table->foreign('article_id')->references('id')->on('users');
