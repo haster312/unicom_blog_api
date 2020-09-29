@@ -59,7 +59,11 @@ class UserService
 
         if (!$user) {
             $profile = $data['profile'];
-            $data['username'] = strtolower($data['first_name'] . $data['last_name']);
+            $username = strtolower(trim($data['last_name']) . trim($data['first_name'])) . "10";
+            $this->checkUsername($username);
+
+            $data['username'] = $username;
+
             unset($data['profile']);
 
             $user = $this->userRepo->create($data);
@@ -118,5 +122,33 @@ class UserService
         $user->update($data);
 
         return $user;
+    }
+
+    public function checkUsername(&$username)
+    {
+        $user = $this->userRepo->model->select('id', 'username')
+            ->where('username', $username)
+            ->orderBy('username', 'DESC')
+            ->first();
+
+        if (!$user) {
+            return true;
+        }
+
+        $username = $user->username;
+        preg_match('#(\d+)$#', $username, $matches);
+
+        if (count($matches) == 0) {
+            $username = $username . "1";
+        } else {
+            $digit = $matches[1];
+            $lens = strlen($digit);
+            $newUsername = substr($username, 0, -$lens);
+            $digit = (int) $digit;
+            $digit++;
+            $username = $newUsername . "$digit";
+        }
+
+        $this->checkUsername($username);
     }
 }

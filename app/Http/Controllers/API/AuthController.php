@@ -49,14 +49,18 @@ class AuthController extends Controller
             'profile_type' => 2
         ];
 
-        $user = $this->userService->createSocialUser($data);
-        if (!$user) {
+        try {
+            $user = $this->userService->createSocialUser($data);
+            if (!$user) {
+                error(messages('Error'));
+            }
+
+            $user = $this->authService->loginByUser($user);
+
+            success($user);
+        } catch (\Exception $exception) {
             error(messages('Error'));
         }
-
-        $user = $this->authService->loginByUser($user);
-
-        success($user);
     }
 
     /**
