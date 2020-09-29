@@ -59,7 +59,7 @@ class UserService
 
         if (!$user) {
             $profile = $data['profile'];
-            $data['username'] = $data['first_name'] . $data['last_name'];
+            $data['username'] = strtolower($data['first_name'] . $data['last_name']);
             unset($data['profile']);
 
             $user = $this->userRepo->create($data);
