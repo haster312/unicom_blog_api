@@ -94,5 +94,7 @@ Route::group(['prefix' => 'search'], function() {
 
 Route::group(['prefix' => 'notification', 'middleware' => ['auth:api']], function() {
     Route::get('/', [NotificationController::class, 'getNotification']);
+    Route::get('/latest', [NotificationController::class, 'getLatestNotification']);
     Route::post('/{id}', [NotificationController::class, 'seenNotification'])->where('id', '[0-9]+');
+    Route::post('/token', [NotificationController::class, 'setNotificationToken']);
 });

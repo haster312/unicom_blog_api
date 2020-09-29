@@ -6,6 +6,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Services\NotificationService;
+use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
@@ -20,7 +21,14 @@ class NotificationController extends Controller
         $this->getUser($user);
         $notifications = $this->notificationService->getUserNotification($user->id);
 
-        paging($notifications);
+        success($notifications);
+    }
+
+    public function getLatestNotification()
+    {
+        $this->getUser($user);
+        $notification = $this->notificationService->getLatestNotification($user->id);
+        success($notification);
     }
 
     public function seenNotification($id)
@@ -32,5 +40,22 @@ class NotificationController extends Controller
         }
 
         success($seen);
+    }
+
+    public function setNotificationToken(Request $request)
+    {
+        try {
+            $this->getUser($user);
+            $data = getData($request);
+
+            $token = $this->notificationService->addUserNotificationToken($user->id, $data['token']);
+            if (!$token) {
+                error(messages('Error'));
+            }
+
+            success($token);
+        } catch (\Exception $exception) {
+            error(messages('Error'));
+        }
     }
 }
