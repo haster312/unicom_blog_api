@@ -21,7 +21,7 @@ class CreateFriendRequestTable extends Migration
             $table->integer('updated_at');
         });
 
-        Schema::table('friend', function (Blueprint $table) {
+        Schema::table('friend_request', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('friend_id')->references('id')->on('users')->cascadeOnDelete();
         });
