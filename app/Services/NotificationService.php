@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Repositories\NotificationRepo;
 use App\Repositories\NotificationTokenRepo;
+use Illuminate\Support\Facades\DB;
 
 class NotificationService extends BaseService
 {
@@ -43,12 +44,34 @@ class NotificationService extends BaseService
             ->first();
     }
 
+    public function getChatNotification($userId)
+    {
+        return $this->notificationRepo->model
+            ->with([
+                'User' => function($q) {
+                    $q->select('id', 'first_name', 'last_name', 'avatar_id', DB::raw("CONCAT( last_name, ' ', first_name ) AS name"));
+                },
+                'User.Avatar' => function($q) {
+                    $q->select('id', 'main', 'thumbnail');
+                }
+            ])
+            ->where('target_id', $userId)
+            ->where('seen', 0)
+            ->where(function ($q) {
+                $q->where('type', constants('NOTI.FRIEND_REQUEST'));
+                $q->orWhere('type', constants('NOTI.ACCEPT_REQUEST'));
+                $q->orWhere('type', constants('NOTI.REJECT_REQUEST'));
+            })
+            ->orderBy('created_at', 'DESC')
+            ->get();
+    }
+
     public function getUserNotification($userId)
     {
         return $this->notificationRepo->model
             ->with([
                 'User' => function($q) {
-                    $q->select('id', 'first_name', 'last_name', 'avatar_id');
+                    $q->select('id', 'first_name', 'last_name', 'avatar_id', DB::raw("CONCAT( last_name, ' ', first_name ) AS name"));
                 },
                 'User.Avatar' => function($q) {
                     $q->select('id', 'main', 'thumbnail');
@@ -59,7 +82,7 @@ class NotificationService extends BaseService
             ])
             ->where('target_id', $userId)
             ->where('seen', 0)
-//            ->limit($this->size)
+            ->orderBy('created_at', 'DESC')
             ->get();
     }
 
@@ -96,4 +119,5 @@ class NotificationService extends BaseService
             'token' => $token
         ]);
     }
+
 }

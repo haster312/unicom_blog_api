@@ -12,6 +12,9 @@ return [
     "NOTI" => [
         "LIKE" => 1,
         "COMMENT" => 2,
-        "FOLLOW" => 3
+        "FOLLOW" => 3,
+        "FRIEND_REQUEST" => 4,
+        "ACCEPT_REQUEST" => 5,
+        "REJECT_REQUEST" => 6
     ]
 ];

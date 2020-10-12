@@ -128,6 +128,15 @@ class ArticleController extends Controller
         }
     }
 
+    public function getRelated(Request $request)
+    {
+        $data = getData($request);
+        $articleId = $data['article_id'];
+
+        $articles = $this->articleService->getRelatedArticle($articleId);
+        success($articles);
+    }
+
     public function getListWithCategory($categoryId)
     {
         $articles = $this->articleService->getArticlesByCategory($categoryId);

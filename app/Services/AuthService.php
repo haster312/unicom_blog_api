@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Repositories\UserRepo;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
@@ -73,5 +74,21 @@ class AuthService
         }
 
         return false;
+    }
+
+    public function changePassword($userId, $data)
+    {
+        $user = $this->userRepo->getModelById($userId);
+        $oldPassword = $data['old_password'];
+        $newPassword = $data['new_password'];
+
+        $checked = Hash::check($oldPassword . getHash(), $user->password);
+        if (!$checked) {
+            error('Old password is not correct');
+        }
+
+        $user = $this->userRepo->update($userId, ['password' => $newPassword]);
+
+        return $user;
     }
 }

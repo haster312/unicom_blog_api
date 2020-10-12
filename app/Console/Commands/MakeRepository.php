@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MakeRepository extends GeneratorCommand
@@ -37,15 +38,35 @@ class MakeRepository extends GeneratorCommand
      */
     public function handle()
     {
-        $model = ucfirst($this->argument('name'));
+        $modelName = $this->ask('name');
+        $tableName = $this->ask('table');
         $namespace = ucfirst($this->option('namespace'));
-        $table = $this->option('table');
-        $this->makeModel($model, $table, $namespace);
-        $this->makeRepo($model, $namespace);
+
+
+        $validator = Validator::make([
+            'model_name' => $modelName,
+            'table_name' => $tableName,
+        ], [
+            'model_name' => ['required'],
+            'table_name' => ['required']
+        ]);
+
+        if ($validator->fails()) {
+            $this->info('Model are not created.');
+
+            foreach ($validator->errors()->all() as $error) {
+                $this->error($error);
+            }
+            return 1;
+        }
+
+        $this->makeModel($modelName, $tableName, $namespace);
+        $this->makeRepo($modelName, $namespace);
     }
 
-    public function makeModel($model, $tableName = null, $namespace = null)
+    public function makeModel($modelName, $tableName = null, $namespace = null)
     {
+        $model = ucfirst($modelName);
         $mainSpace = $namespace ? "namespace App\Models\\$namespace;" : "namespace App\Models;";
         $tableName = $tableName ? 'protected $table = ' . "'$tableName';" : '';
         $content = "<?php
@@ -67,17 +88,18 @@ class {$model} extends Model
             File::makeDirectory($folder, $mode = 0777, true, true);
         }
 
-        $written = Storage::disk('app')->put('Models/' . $namespace . '/'. $this->argument('name') . '.php', $content);
+        $written = Storage::disk('app')->put('Models/' . $namespace . '/'. $modelName . '.php', $content);
 
         if ($written) {
-            $this->info('Created new model ' . $this->argument('name') . '.php in App\Models\\' . $namespace);
+            $this->info('Created new model ' . $modelName . '.php in App\Models\\' . $namespace);
         } else {
             $this->info('Something went wrong');
         }
     }
 
-    public function makeRepo($model, $namespace)
+    public function makeRepo($modelName, $namespace)
     {
+        $model = ucfirst($modelName);
         $mainSpace = $namespace ? "namespace App\Repositories\\$namespace;" : "namespace App\Repositories;";
         $modelSpace = $namespace ? "use App\Models\\$namespace\\$model;" : "use App\Models\\$model;";
         $content = "<?php
@@ -101,10 +123,10 @@ class {$model}Repo extends BaseRepo
             File::makeDirectory($folder, $mode = 0777, true, true);
         }
 
-        $written = Storage::disk('app')->put('Repositories/' . $namespace . '/'. $this->argument('name') . 'Repo.php', $content);
+        $written = Storage::disk('app')->put('Repositories/' . $namespace . '/'. $modelName . 'Repo.php', $content);
 
         if ($written) {
-            $this->info('Created new Repo ' . $this->argument('name') . 'Repo.php in App\Repositories\\' . $namespace);
+            $this->info('Created new Repo ' . $modelName . 'Repo.php in App\Repositories\\' . $namespace);
         } else {
             $this->info('Something went wrong');
         }

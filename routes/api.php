@@ -12,6 +12,7 @@ use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\TagController;
 use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\NotificationController;
+use App\Http\Controllers\API\FriendController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/register/social', [AuthController::class, 'socialRegister']);
@@ -40,7 +41,8 @@ Route::group(['prefix' => 'user'], function () {
     Route::group(['middleware' => ['auth:api']], function () {
         Route::get('/', [UserController::class, 'detail']);
         Route::post('/update', [UserController::class, 'update']);
-        Route::post('/password/change', [UserController::class, 'changePassword']);
+        Route::post('/password/change', [AuthController::class, 'changePassword']);
+        Route::post('/check', [AuthController::class, 'checkValidToken']);
     });
 
     Route::get('/{username}', [UserController::class, 'getDetailByUsername']);
@@ -58,6 +60,7 @@ Route::group(['prefix' => 'article'], function () {
     Route::get('/slug/{slug}', [ArticleController::class, 'detailSlug']);
     Route::get('/user', [ArticleController::class, 'getUserArticle']);
     Route::get('/latest', [ArticleController::class, 'getLatest']);
+    Route::get('/related', [ArticleController::class, 'getRelated']);
     Route::get('/popular/most', [ArticleController::class, 'getMostPopular']);
     Route::get('/popular/week', [ArticleController::class, 'getWeeklyPopular']);
     Route::get('/popular/month', [ArticleController::class, 'getMonthlyPopular']);
@@ -97,4 +100,13 @@ Route::group(['prefix' => 'notification', 'middleware' => ['auth:api']], functio
     Route::get('/latest', [NotificationController::class, 'getLatestNotification']);
     Route::post('/{id}', [NotificationController::class, 'seenNotification'])->where('id', '[0-9]+');
     Route::post('/token', [NotificationController::class, 'setNotificationToken']);
+    Route::get('/chat', [NotificationController::class, 'getChatNotification']);
+});
+
+Route::group(['prefix' => 'friend', 'middleware' => ['auth:api']], function() {
+    Route::get('/', [FriendController::class, 'getFriendList']);
+    Route::post('/request', [FriendController::class, 'addRequest']);
+    Route::get('/search', [FriendController::class, 'searchFriend']);
+    Route::post('/accept', [FriendController::class, 'acceptRequest']);
+    Route::post('/reject', [FriendController::class, 'rejectRequest']);
 });

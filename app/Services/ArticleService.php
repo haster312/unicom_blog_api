@@ -182,10 +182,40 @@ class ArticleService extends BaseService
             )
             ->with($this->categoryRelation)
             ->where('status', 1)
+            ->orderBy('created_at', 'DESC')
             ->orderBy('view_count', 'DESC')
             ->limit($this->size)->get();
     }
 
+    public function getRelatedArticle($articleId)
+    {
+        $article = $this->articleRepo->getModelById($articleId);
+        $tags = $article->ArticleTag->map(function($articleTag) {
+            return $articleTag->tag_id;
+        });
+
+        $title = $article->title;
+
+        $query = $this->articleRepo->model
+            ->select('article.id', 'title', 'short_content', 'cover_id', 'slug',
+                'author_id', 'category_id', 'subcategory_id', 'view_count', 'status', 'article.created_at', 'article.updated_at',
+                $this->countLike,
+                DB::raw("MATCH(article.title) AGAINST('$title') AS score")
+            )
+            ->with($this->categoryRelation)
+            ->where('article.status', 1)
+            ->where('article.category_id', $article->category_id)
+            ->where('article.id', '!=', $articleId);
+
+        if (count($tags) > 0) {
+            $query->join('article_tag', 'article_tag.article_id', '=', 'article.id');
+            $query->whereIn('article_tag.tag_id', $tags);
+            $query->groupBy('article_tag.article_id');
+        }
+
+        return $query->orderBy('score', 'DESC')
+            ->limit($this->size)->get();
+    }
     /**
      * Check if article belong to user
      * @param $userId
@@ -337,6 +367,7 @@ class ArticleService extends BaseService
     {
         if (count($tags) > 0) {
             foreach ($tags as $tagName) {
+                $tagName = strtolower(trim($tagName));
                 $tag = $this->tagRepo->checkExistOrCreate($tagName, false);
                 $this->tagIds[] = $tag->id;
             }

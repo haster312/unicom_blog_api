@@ -58,4 +58,12 @@ class NotificationController extends Controller
             error(messages('Error'));
         }
     }
+
+    public function getChatNotification()
+    {
+        $this->getUser($user);
+        $notifications = $this->notificationService->getChatNotification($user->id);
+
+        success($notifications);
+    }
 }

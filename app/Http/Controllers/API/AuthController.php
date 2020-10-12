@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Services\AuthService;
@@ -70,6 +71,10 @@ class AuthController extends Controller
     {
         $data = getData($request);
         $user = $this->authService->doLogin($data['email'], $data['password']);
+        if (!$user) {
+            error(messages('WrongCredential'), 403);
+        }
+
         $detail = $this->userService->getUserDetail($user->id);
         $detail->token = $user->token;
 
@@ -80,6 +85,19 @@ class AuthController extends Controller
         success($detail);
     }
 
+    public function checkValidToken()
+    {
+        $this->getUser($user);
+
+        if (!$user) {
+            error(messages('Forbidden'));
+        }
+
+        success([
+            'id' => $user->id
+        ]);
+    }
+
     public function logout()
     {
         if (auth()->check()) {
@@ -88,5 +106,18 @@ class AuthController extends Controller
         }
 
         error(messages('Error'), 401);
+    }
+
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        $this->getUser($user);
+        $data = getData($request);
+
+        $changed = $this->authService->changePassword($user->id, $data);
+        if (!$changed) {
+            error(messages('Error'));
+        }
+
+        success($changed);
     }
 }

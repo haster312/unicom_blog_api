@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Models\ArticleComment;
 use App\Models\ArticleLike;
+use App\Models\FriendRequest;
 use App\Models\Image;
 use App\Observers\CommentObserver;
+use App\Observers\FriendRequestObserver;
 use App\Observers\ImageObserver;
 use App\Observers\LikeObserver;
 use Illuminate\Support\Facades\Schema;
@@ -20,9 +22,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $allowedOrigins = ['http://localhost:3000', 'https://localhost:3000',
-            'http://staging.myunicoms.com',
-            'https://staging.myunicoms.com',
+        $allowedOrigins = [
+            'http://localhost:3000',
+            'https://localhost:3000',
+            'http://localhost:8080',
+            'https://localhost:8080',
+            'https://localhost:5000',
+            'http://localhost:5000',
             'http://myunicoms.com',
             'https://myunicoms.com',
             'http://www.myunicoms.com',
@@ -50,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
     {
         ArticleLike::observe(LikeObserver::class);
         ArticleComment::observe(CommentObserver::class);
+        FriendRequest::observe(FriendRequestObserver::class);
         Schema::defaultStringLength(200);
     }
 }

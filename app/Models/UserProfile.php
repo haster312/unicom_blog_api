@@ -9,5 +9,8 @@ class UserProfile extends Model
 {
     use Base;
     protected $table = 'user_profile';
-    protected $fillable = ['user_id', 'profile_type', 'job_title', 'company', 'university'];
+    protected $fillable = [
+        'user_id', 'profile_type', 'job_title', 'company', 'university', 'date_of_birth',
+        'facebook', 'twitter', 'linkedin', 'instagram'
+    ];
 }

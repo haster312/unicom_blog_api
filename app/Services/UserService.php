@@ -41,7 +41,6 @@ class UserService
         }
 
         $profile['user_id'] = $user->id;
-
         $profile = $this->userProfileRepo->create($profile);
 
         return $this->getUserDetail($user->id);
@@ -118,10 +117,13 @@ class UserService
 
     public function updateUserDetail($userId, $data)
     {
-        $user = $this->getUserDetail($userId);
-        $user->update($data);
+        $profile = $data['profile'];
+        unset($data['profile']);
+        $this->userRepo->update($userId, $data);
+        $userProfile = $this->userProfileRepo->getModelByField('user_id', $userId, true);
+        $this->userProfileRepo->update($userProfile->id, $profile);
 
-        return $user;
+        return $this->getUserDetail($userId);
     }
 
     public function checkUsername(&$username)
@@ -151,4 +153,5 @@ class UserService
 
         $this->checkUsername($username);
     }
+
 }

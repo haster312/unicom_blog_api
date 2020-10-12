@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateUserRequest;
 use App\Services\UserService;
 use Illuminate\Http\Request;
-use function Symfony\Component\String\u;
 
 class UserController extends Controller
 {
@@ -48,10 +47,5 @@ class UserController extends Controller
         } catch (\Exception $exception) {
             error($exception->getMessage());
         }
-    }
-
-    public function changePassword()
-    {
-
     }
 }
